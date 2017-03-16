@@ -54,9 +54,7 @@ public class MinimizedArrangement<User extends Serializable> extends ChatHeadArr
         @Override
         public void onSpringAtRest(Spring spring) {
             super.onSpringAtRest(spring);
-            if (isTransitioning) {
-                isTransitioning = false;
-            }
+
         }
     };
     private SpringListener verticalHeroListener = new SimpleSpringListener() {
@@ -69,12 +67,9 @@ public class MinimizedArrangement<User extends Serializable> extends ChatHeadArr
         @Override
         public void onSpringAtRest(Spring spring) {
             super.onSpringAtRest(spring);
-            if (isTransitioning) {
-                isTransitioning = false;
-            }
+
         }
     };
-    private boolean isTransitioning;
 
     public MinimizedArrangement(ChatHeadManager manager) {
         this.manager = manager;
@@ -95,7 +90,6 @@ public class MinimizedArrangement<User extends Serializable> extends ChatHeadArr
 
     @Override
     public void onActivate(ChatHeadManager container, Bundle extras, int maxWidth, int maxHeight) {
-        isTransitioning = true;
         if (horizontalSpringChain != null || verticalSpringChain != null) {
             onDeactivate(maxWidth, maxHeight);
         }
