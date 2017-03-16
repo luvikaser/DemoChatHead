@@ -32,8 +32,6 @@ public class ChatHeadContainer extends FrameChatHeadContainer {
 
     private View motionCaptureView;
 
-    private int cachedHeight;
-    private int cachedWidth;
     private WindowManager windowManager;
     private ChatHeadArrangement currentArrangement;
     private boolean motionCaptureViewAdded;
@@ -194,7 +192,9 @@ public class ChatHeadContainer extends FrameChatHeadContainer {
             layoutParams.flags |= FLAG_NOT_FOCUSABLE; //remove focusability
             layoutParams.flags &= ~FLAG_NOT_TOUCHABLE; //add touch
             layoutParams.flags |= FLAG_NOT_TOUCH_MODAL; //add touch
-            windowManager.updateViewLayout(motionCaptureView, layoutParams);
+            if (motionCaptureViewAdded) {
+                windowManager.updateViewLayout(motionCaptureView, layoutParams);
+            }
 
             layoutParams = getOrCreateLayoutParamsForContainer(getFrameLayout());
             layoutParams.flags |= FLAG_NOT_FOCUSABLE | FLAG_NOT_TOUCHABLE;

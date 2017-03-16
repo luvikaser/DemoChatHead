@@ -28,16 +28,16 @@ public class ChatHeadCloseButton extends ImageView {
     private int centerX;
     private int centerY;
 
-    public ChatHeadCloseButton(Context context, ChatHeadManager manager, int maxHeight, int maxWidth) {
+    public ChatHeadCloseButton(Context context, ChatHeadManager manager) {
         super(context);
-        init(manager, maxHeight, maxWidth);
+        init(manager);
     }
 
     public boolean isDisappeared() {
         return disappeared;
     }
 
-    private void init(final ChatHeadManager manager, int maxHeight, int maxWidth) {
+    private void init(final ChatHeadManager manager) {
         this.chatHeadManager = manager;
 
         setImageResource(R.drawable.dismiss_big);
@@ -71,6 +71,7 @@ public class ChatHeadCloseButton extends ImageView {
         });
     }
 
+
     private int getYFromSpring(Spring spring) {
         return centerY + (int) spring.getCurrentValue() - getMeasuredHeight() / 2;
     }
@@ -79,6 +80,7 @@ public class ChatHeadCloseButton extends ImageView {
         return centerX + (int) spring.getCurrentValue() - getMeasuredWidth() / 2;
     }
 
+    //Close button appears
     public void appear() {
         if (isEnabled()) {
             ySpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
@@ -92,19 +94,11 @@ public class ChatHeadCloseButton extends ImageView {
                 }
             }
             disappeared = false;
-
         }
     }
 
-    public void onCapture() {
-        scaleSpring.setEndValue(1);
-    }
-
-    public void onRelease() {
-        scaleSpring.setEndValue(0.8);
-    }
-
-    public void disappear(boolean immediate, boolean animate) {
+    //Close button disappears
+    public void disappear() {
         ySpring.setEndValue(mParentHeight - centerY + chatHeadManager.getConfig().getCloseButtonHeight());
         ySpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
         xSpring.setEndValue(0);
@@ -116,19 +110,25 @@ public class ChatHeadCloseButton extends ImageView {
             }
         });
         scaleSpring.setEndValue(0.1f);
-        if (!animate) {
-            ySpring.setCurrentValue(mParentHeight, true);
-            xSpring.setCurrentValue(0, true);
-        }
         disappeared = true;
         chatHeadManager.onCloseButtonDisappear();
 
     }
 
+    //when close button is captured
+    public void onCapture() {
+        scaleSpring.setEndValue(1);
+    }
+
+    //when close button is released
+    public void onRelease() {
+        scaleSpring.setEndValue(0.8);
+    }
+
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        disappear(true, false);
+        disappear();
     }
 
     public void onParentHeightRefreshed() {
@@ -136,6 +136,7 @@ public class ChatHeadCloseButton extends ImageView {
         mParentHeight = chatHeadManager.getMaxHeight();
     }
 
+    //set center position for close button when onMeasure
     public void setCenter(int x, int y) {
         boolean changed = false;
         if (x != centerX || y != centerY) {
@@ -144,11 +145,12 @@ public class ChatHeadCloseButton extends ImageView {
         if(changed) {
             this.centerX = x;
             this.centerY = y;
-            xSpring.setCurrentValue(0,false);
-            ySpring.setCurrentValue(0,false);
+            xSpring.setCurrentValue(0, false);
+            ySpring.setCurrentValue(0, false);
         }
     }
 
+    //update endValue for close button translation when dragging chatHead
     public void pointTo(float x, float y) {
         if (isEnabled()) {
             double translationX = getTranslationFromSpring(x, PERC_PARENT_WIDTH, mParentWidth);
@@ -164,10 +166,6 @@ public class ChatHeadCloseButton extends ImageView {
     private double getTranslationFromSpring(double springValue, float percent, int fullValue) {
         float widthToCover = percent * fullValue;
         return SpringUtil.mapValueFromRangeToRange(springValue, 0, fullValue, -widthToCover / 2, widthToCover / 2);
-    }
-
-    public boolean isAtRest() {
-        return xSpring.isAtRest() && ySpring.isAtRest();
     }
 
     public int getEndValueX() {

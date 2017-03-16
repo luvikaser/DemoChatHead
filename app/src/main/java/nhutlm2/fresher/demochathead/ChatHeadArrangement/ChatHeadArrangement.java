@@ -13,7 +13,7 @@ import nhutlm2.fresher.demochathead.ChatHeadManager.ChatHeadManager;
  */
 
 public abstract class ChatHeadArrangement {
-    public abstract void onActivate(ChatHeadManager container, Bundle extras, int maxWidth, int maxHeight, boolean animated);
+    public abstract void onActivate(ChatHeadManager container, Bundle extras, int maxWidth, int maxHeight);
 
     public abstract void onDeactivate(int maxWidth, int maxHeight);
 
@@ -21,7 +21,7 @@ public abstract class ChatHeadArrangement {
 
     public abstract boolean handleTouchUp(ChatHead activeChatHead, int xVelocity, int yVelocity, Spring activeHorizontalSpring, Spring activeVerticalSpring, boolean wasDragging);
 
-    public abstract void onChatHeadAdded(ChatHead chatHead, boolean animated);
+    public abstract void onChatHeadAdded(ChatHead chatHead);
 
     public abstract void onChatHeadRemoved(ChatHead removed);
 

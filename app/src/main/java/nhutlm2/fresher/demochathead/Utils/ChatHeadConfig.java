@@ -57,7 +57,7 @@ public class ChatHeadConfig {
         this.headWidth = headWidth;
     }
 
-    public int getHeadHorizontalSpacing(int maxWidth, int maxHeight) {
+    public int getHeadHorizontalSpacing() {
         return headHorizontalSpacing;
     }
 
@@ -65,7 +65,7 @@ public class ChatHeadConfig {
         this.headHorizontalSpacing = headHorizontalSpacing;
     }
 
-    public int getHeadVerticalSpacing(int maxWidth, int maxHeight) {
+    public int getHeadVerticalSpacing() {
         return headVerticalSpacing;
     }
 
@@ -81,9 +81,6 @@ public class ChatHeadConfig {
         this.initialPosition = initialPosition;
     }
 
-    public int getMaxChatHeads(int maxWidth, int maxHeight) {
-        return maxChatHeads;
-    }
 
     public int getCloseButtonWidth() {
         return closeButtonWidth;

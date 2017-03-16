@@ -35,15 +35,15 @@ public interface ChatHeadManagerListener<User extends Serializable> {
 
         void onMeasure(int height, int width);
 
-        ChatHead<User> addChatHead(User user, boolean isSticky, boolean animated);
+        ChatHead<User> addChatHead(User user);
 
         ChatHead<User> findChatHeadByKey(User user);
 
         void reloadDrawable(User user);
 
-        void removeAllChatHeads(boolean userTriggered);
+        void removeAllChatHeads();
 
-        boolean removeChatHead(User user, boolean userTriggered);
+        boolean removeChatHead(User user);
 
         ChatHeadOverlayView getOverlayView();
 
@@ -52,8 +52,6 @@ public interface ChatHeadManagerListener<User extends Serializable> {
         ChatHeadArrangement getArrangement(Class<? extends ChatHeadArrangement> arrangementType);
 
         void setArrangement(Class<? extends ChatHeadArrangement> arrangement, Bundle extras);
-
-        void setArrangement(Class<? extends ChatHeadArrangement> arrangement, Bundle extras, boolean animated);
 
         View attachView(ChatHead<User> activeChatHead, ViewGroup parent);
 

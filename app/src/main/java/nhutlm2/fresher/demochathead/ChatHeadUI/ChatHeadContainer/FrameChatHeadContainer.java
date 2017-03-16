@@ -55,14 +55,14 @@ public abstract class FrameChatHeadContainer implements ChatHeadContainerListene
 
     @Override
     public void requestLayout() {
-        if(frameLayout!=null) {
+        if(frameLayout != null) {
             frameLayout.requestLayout();
         }
     }
 
     @Override
     public void removeView(View view) {
-        if (frameLayout!=null) {
+        if (frameLayout != null) {
             frameLayout.removeView(view);
         }
     }

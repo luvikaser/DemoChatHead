@@ -46,7 +46,7 @@ public class HostFrameLayout extends FrameLayout{
 
     public void minimize() {
         if (!(manager.getActiveArrangement() instanceof MinimizedArrangement)) {
-            manager.setArrangement(MinimizedArrangement.class, null, true);
+            manager.setArrangement(MinimizedArrangement.class, null);
         }
     }
 

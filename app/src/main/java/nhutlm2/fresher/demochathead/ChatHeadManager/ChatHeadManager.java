@@ -149,7 +149,7 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
             } else {
                 if (needsLayout) {
                     // this means height changed and we need to redraw.
-                    setArrangementImpl(new ArrangementChangeRequest(activeArrangement.getClass(), null, false));
+                    setArrangementImpl(new ArrangementChangeRequest(activeArrangement.getClass(), null));
 
                 }
             }
@@ -160,21 +160,25 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
 
 
     @Override
-    public ChatHead<User> addChatHead(User user, boolean isSticky, boolean animated) {
+    public ChatHead<User> addChatHead(User user) {
         ChatHead<User> chatHead = findChatHeadByKey(user);
         if (chatHead == null) {
-            chatHead = new ChatHead<User>(this, springSystem, getContext(), isSticky);
+            chatHead = new ChatHead<User>(this, springSystem, getContext());
             chatHead.setUser(user);
             chatHeads.add(chatHead);
             ViewGroup.LayoutParams layoutParams = chatHeadContainer.createLayoutParams(getConfig().getHeadWidth(), getConfig().getHeadHeight(), Gravity.START | Gravity.TOP, 0);
 
             chatHeadContainer.addView(chatHead, layoutParams);
-            if (chatHeads.size() > config.getMaxChatHeads(maxWidth, maxHeight) && activeArrangement != null) {
-                activeArrangement.removeOldestChatHead();
+            if (chatHeads.size() > config.getMaxChatHeads()) {
+                if (activeArrangement != null) {
+                    activeArrangement.removeOldestChatHead();
+                } else{
+                    removeChatHead(chatHeads.get(0).getUser());
+                }
             }
             reloadDrawable(user);
             if (activeArrangement != null)
-                activeArrangement.onChatHeadAdded(chatHead, animated);
+                activeArrangement.onChatHeadAdded(chatHead);
             else {
                 chatHead.getHorizontalSpring().setCurrentValue(-100);
                 chatHead.getVerticalSpring().setCurrentValue(-100);
@@ -204,26 +208,27 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
     }
 
     @Override
-    public void removeAllChatHeads(boolean userTriggered) {
+    public void removeAllChatHeads() {
         for (Iterator<ChatHead<User>> iterator = chatHeads.iterator(); iterator.hasNext(); ) {
             ChatHead<User> chatHead = iterator.next();
             iterator.remove();
-            onChatHeadRemoved(chatHead, userTriggered);
+            onChatHeadRemoved(chatHead);
         }
     }
 
     @Override
-    public boolean removeChatHead(User user, boolean userTriggered) {
+    public boolean removeChatHead(User user) {
+
         ChatHead chatHead = findChatHeadByKey(user);
         if (chatHead != null) {
             chatHeads.remove(chatHead);
-            onChatHeadRemoved(chatHead, userTriggered);
+            onChatHeadRemoved(chatHead);
             return true;
         }
         return false;
     }
 
-    private void onChatHeadRemoved(ChatHead chatHead, boolean userTriggered) {
+    private void onChatHeadRemoved(ChatHead chatHead) {
         if (chatHead != null && chatHead.getParent() != null) {
             chatHead.onRemove();
             chatHeadContainer.removeView(chatHead);
@@ -250,7 +255,7 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
         chatHeadContainer.addView(arrowLayout, arrowLayout.getLayoutParams());
         arrowLayout.setVisibility(View.GONE);
         springSystem = SpringSystem.create();
-        closeButton = new ChatHeadCloseButton(context, this, maxHeight, maxWidth);
+        closeButton = new ChatHeadCloseButton(context, this);
         ViewGroup.LayoutParams layoutParams = chatHeadContainer.createLayoutParams(chatHeadDefaultConfig.getCloseButtonHeight(), chatHeadDefaultConfig.getCloseButtonWidth(), Gravity.TOP | Gravity.START, 0);
         chatHeadContainer.addView(closeButton, layoutParams);
         closeButtonShadow = new ImageView(getContext());
@@ -305,12 +310,7 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
 
     @Override
     public void setArrangement(Class<? extends ChatHeadArrangement> arrangement, Bundle extras) {
-        setArrangement(arrangement, extras, true);
-    }
-
-    @Override
-    public void setArrangement(final Class<? extends ChatHeadArrangement> arrangement, Bundle extras, boolean animated) {
-        this.requestedArrangement = new ArrangementChangeRequest(arrangement, extras, animated);
+        this.requestedArrangement = new ArrangementChangeRequest(arrangement, extras);
         chatHeadContainer.requestLayout();
     }
 
@@ -335,7 +335,7 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
         }
         activeArrangement = requestedArrangement;
         activeArrangementBundle = extras;
-        requestedArrangement.onActivate(this, extras, maxWidth, maxHeight, requestedArrangementParam.isAnimated());
+        requestedArrangement.onActivate(this, extras, maxWidth, maxHeight);
         if (hasChanged) {
             chatHeadContainer.onArrangementChanged(oldArrangement, newArrangement);
         }
@@ -429,11 +429,6 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
     public void setConfig(ChatHeadConfig config) {
         this.config = config;
         if (closeButton != null) {
-//            LayoutParams params = (LayoutParams) closeButton.getLayoutParams();
-//            params.width = config.getCloseButtonWidth();
-//            params.height = config.getCloseButtonHeight();
-//            params.bottomMargin = config.getCloseButtonBottomMargin();
-//            closeButton.setLayoutParams(params);
             if (config.isCloseButtonHidden()) {
                 closeButton.setVisibility(View.GONE);
                 closeButtonShadow.setVisibility(View.GONE);
@@ -461,12 +456,10 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
     private class ArrangementChangeRequest {
         private final Bundle extras;
         private final Class<? extends ChatHeadArrangement> arrangement;
-        private final boolean animated;
 
-        public ArrangementChangeRequest(Class<? extends ChatHeadArrangement> arrangement, Bundle extras, boolean animated) {
+        public ArrangementChangeRequest(Class<? extends ChatHeadArrangement> arrangement, Bundle extras) {
             this.arrangement = arrangement;
             this.extras = extras;
-            this.animated = animated;
         }
 
         public Bundle getExtras() {
@@ -477,8 +470,5 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
             return arrangement;
         }
 
-        public boolean isAnimated() {
-            return animated;
-        }
     }
 }

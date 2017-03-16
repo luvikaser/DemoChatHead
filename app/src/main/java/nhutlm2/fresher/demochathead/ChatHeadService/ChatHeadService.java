@@ -1,7 +1,5 @@
 package nhutlm2.fresher.demochathead.ChatHeadService;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -12,7 +10,6 @@ import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.os.Binder;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +26,6 @@ import nhutlm2.fresher.demochathead.ChatHeadUI.ChatHeadDrawable.AvatarDrawer;
 import nhutlm2.fresher.demochathead.ChatHeadUI.ChatHeadDrawable.ChatHeadDrawable;
 import nhutlm2.fresher.demochathead.ChatHeadUI.ChatHeadDrawable.NotificationDrawer;
 import nhutlm2.fresher.demochathead.ChatHeadManager.ChatHeadManager;
-import nhutlm2.fresher.demochathead.MainActivity;
 import nhutlm2.fresher.demochathead.ChatHeadUI.PopupFragment.ChatHeadViewAdapter;
 import nhutlm2.fresher.demochathead.R;
 
@@ -47,9 +43,7 @@ public class ChatHeadService extends Service {
     }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-
+    public int onStartCommand(Intent intent, int flags, int startId) {
         chatHeadContainer = new ChatHeadContainer(this);
         chatHeadManager = new ChatHeadManager<User>(this, chatHeadContainer);
         chatHeadManager.setViewAdapter(new ChatHeadViewAdapter<User>() {
@@ -78,7 +72,7 @@ public class ChatHeadService extends Service {
             @Override
             public void detachView(User user, ChatHead<? extends Serializable> chatHead, ViewGroup parent) {
                 View cachedView = viewCache.get(user);
-                if(cachedView!=null) {
+                if(cachedView != null) {
                     parent.removeView(cachedView);
                 }
             }
@@ -86,9 +80,12 @@ public class ChatHeadService extends Service {
             @Override
             public void removeView(User user, ChatHead<? extends Serializable> chatHead, ViewGroup parent) {
                 View cachedView = viewCache.get(user);
-                if(cachedView!=null) {
+                if(cachedView != null) {
                     viewCache.remove(user);
                     parent.removeView(cachedView);
+//                    if (viewCache.isEmpty()){
+//                        stopSelf();
+//                    }
                 }
             }
 
@@ -98,12 +95,13 @@ public class ChatHeadService extends Service {
             }
         });
 
+        chatHeadManager.setArrangement(MinimizedArrangement.class, null);
         testData();
 
-        chatHeadManager.setArrangement(MinimizedArrangement.class, null);
-        moveToForeground();
-
+        return super.onStartCommand(intent, flags, startId);
     }
+
+
 
     private void testData() {
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -121,6 +119,15 @@ public class ChatHeadService extends Service {
         Bitmap bitmap4 = BitmapFactory.decodeResource(getResources(), R.drawable.avatar4, options);
         User user4 = new User(4, 20, bitmap4);
         addChatHead(user4);
+
+        Bitmap bitmap5 = BitmapFactory.decodeResource(getResources(), R.drawable.avatar4, options);
+        User user5 = new User(4, 20, bitmap5);
+        addChatHead(user5);
+        Bitmap bitmap6 = BitmapFactory.decodeResource(getResources(), R.drawable.avatar4, options);
+        User user6 = new User(4, 20, bitmap6);
+        addChatHead(user6);
+
+
     }
 
     @Override
@@ -137,19 +144,8 @@ public class ChatHeadService extends Service {
         return chatHeadDrawable;
     }
 
-    private void moveToForeground() {
-        Notification notification = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.notification_template_icon_bg)
-                .setContentTitle("Springy heads")
-                .setContentText("Click to configure.")
-                .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0))
-                .build();
-
-        startForeground(1, notification);
-    }
-
     public void addChatHead(User user) {
-        chatHeadManager.addChatHead(user, false, true);
+        chatHeadManager.addChatHead(user);
         chatHeadManager.bringToFront(chatHeadManager.findChatHeadByKey(user));
     }
 

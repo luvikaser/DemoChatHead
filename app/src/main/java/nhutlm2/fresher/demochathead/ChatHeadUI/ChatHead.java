@@ -29,10 +29,8 @@ public class ChatHead<User extends Serializable> extends ImageView implements Sp
 
     public final int CLOSE_ATTRACTION_THRESHOLD = ChatHeadUtils.dpToPx(getContext(), 110);
     private final int touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
-    private final float DELTA = ChatHeadUtils.dpToPx(getContext(), 10);
     private ChatHeadManager manager;
     private SpringSystem springSystem;
-    private boolean isSticky = false;
     private State state;
     private User user;
     private float downX = -1;
@@ -41,14 +39,11 @@ public class ChatHead<User extends Serializable> extends ImageView implements Sp
     private boolean isDragging;
     private float downTranslationX;
     private float downTranslationY;
-    private int unreadCount = 0;
     private SpringListener xPositionListener;
     private SpringListener yPositionListener;
     private Spring scaleSpring;
     private Spring xPositionSpring;
     private Spring yPositionSpring;
-    private Bundle extras;
-    private ImageView imageView;
     private boolean isHero;
 
     public ChatHead(Context context) {
@@ -66,11 +61,10 @@ public class ChatHead<User extends Serializable> extends ImageView implements Sp
         throw new IllegalArgumentException("This constructor cannot be used");
     }
 
-    public ChatHead(ChatHeadManager manager, SpringSystem springsHolder, Context context, boolean isSticky) {
+    public ChatHead(ChatHeadManager manager, SpringSystem springsHolder, Context context) {
         super(context);
         this.manager = manager;
         this.springSystem = springsHolder;
-        this.isSticky = isSticky;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
             setLayerType(LAYER_TYPE_SOFTWARE, null);
         }
@@ -85,24 +79,12 @@ public class ChatHead<User extends Serializable> extends ImageView implements Sp
         isHero = hero;
     }
 
-    public Bundle getExtras() {
-        return extras;
-    }
-
-    public void setExtras(Bundle extras) {
-        this.extras = extras;
-    }
-
     public Spring getHorizontalSpring() {
         return xPositionSpring;
     }
 
     public Spring getVerticalSpring() {
         return yPositionSpring;
-    }
-
-    public boolean isSticky() {
-        return isSticky;
     }
 
     private void init() {
@@ -151,17 +133,6 @@ public class ChatHead<User extends Serializable> extends ImageView implements Sp
         scaleSpring.setCurrentValue(1).setAtRest();
     }
 
-    public int getUnreadCount() {
-        return unreadCount;
-    }
-
-    public void setUnreadCount(int unreadCount) {
-        if (unreadCount != this.unreadCount) {
-            manager.reloadDrawable(user);
-        }
-        this.unreadCount = unreadCount;
-    }
-
     public State getState() {
         return state;
     }
@@ -207,18 +178,11 @@ public class ChatHead<User extends Serializable> extends ImageView implements Sp
 
     }
 
-    public SpringListener getHorizontalPositionListener() {
-        return xPositionListener;
-    }
-
-    public SpringListener getVerticalPositionListener() {
-        return yPositionListener;
-    }
 
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
         super.onTouchEvent(event);
-        if(xPositionSpring==null || yPositionSpring==null) return false;
+        if(xPositionSpring == null || yPositionSpring == null) return false;
         //Chathead view will set the correct active springs on touch
         Spring activeHorizontalSpring = xPositionSpring;
         Spring activeVerticalSpring = yPositionSpring;
@@ -235,7 +199,6 @@ public class ChatHead<User extends Serializable> extends ImageView implements Sp
                 velocityTracker = VelocityTracker.obtain();
             } else {
                 velocityTracker.clear();
-
             }
             activeHorizontalSpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
             activeVerticalSpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
@@ -248,8 +211,6 @@ public class ChatHead<User extends Serializable> extends ImageView implements Sp
             activeHorizontalSpring.setAtRest();
             activeVerticalSpring.setAtRest();
             velocityTracker.addMovement(event);
-
-
         } else if (action == MotionEvent.ACTION_MOVE) {
             if (Math.hypot(offsetX, offsetY) > touchSlop) {
                 isDragging = true;
@@ -297,8 +258,8 @@ public class ChatHead<User extends Serializable> extends ImageView implements Sp
                 int yVelocity = (int) velocityTracker.getYVelocity();
                 velocityTracker.recycle();
                 velocityTracker = null;
-                if(xPositionSpring!=null && yPositionSpring!=null) {
-                    boolean touchUpHandled = manager.getActiveArrangement().handleTouchUp(this, xVelocity, yVelocity, activeHorizontalSpring, activeVerticalSpring, wasDragging);
+                if(xPositionSpring != null && yPositionSpring != null) {
+                    manager.getActiveArrangement().handleTouchUp(this, xVelocity, yVelocity, activeHorizontalSpring, activeVerticalSpring, wasDragging);
                 }
             }
         }
