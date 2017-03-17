@@ -8,6 +8,10 @@ import java.io.Serializable;
 
 import nhutlm2.fresher.demochathead.ChatHeadUI.ChatHead;
 
+/**
+ * Created by luvikaser on 01/03/2017.
+ */
+
 public interface ChatHeadViewAdapter<User> {
 
     View attachView(User user, ChatHead<? extends Serializable> chatHead, ViewGroup parent);

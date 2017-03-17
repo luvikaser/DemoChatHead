@@ -38,7 +38,7 @@ import nhutlm2.fresher.demochathead.Utils.ChatHeadOverlayView;
 import nhutlm2.fresher.demochathead.Utils.SpringConfigsHolder;
 
 /**
- * Created by cpu1-216-local on 07/03/2017.
+ * Created by luvikaser on 07/03/2017.
  */
 
 public class ChatHeadManager<User extends Serializable> implements ChatHeadManagerListener<User>{
@@ -56,10 +56,7 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
     private boolean overlayVisible;
     private ImageView closeButtonShadow;
     private SpringSystem springSystem;
-    private FragmentManager fragmentManager;
-    private Fragment currentFragment;
     private ChatHeadConfig config;
-    private Bundle activeArrangementBundle;
     private ArrangementChangeRequest requestedArrangement;
     private DisplayMetrics displayMetrics;
     private UpArrowLayout arrowLayout;
@@ -118,14 +115,6 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
         }
         return null;
     }
-
-    @Override
-    public void selectChatHead(ChatHead chatHead) {
-        if (activeArrangement != null)
-            activeArrangement.selectChatHead(chatHead);
-    }
-
-
 
     @Override
     public void onMeasure(int height, int width) {
@@ -298,17 +287,6 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
     }
 
     @Override
-    public void captureChatHeads(ChatHead causingChatHead) {
-        activeArrangement.onCapture(this, causingChatHead);
-    }
-
-
-    @Override
-    public ChatHeadArrangement getArrangement(Class<? extends ChatHeadArrangement> arrangementType) {
-        return arrangements.get(arrangementType);
-    }
-
-    @Override
     public void setArrangement(Class<? extends ChatHeadArrangement> arrangement, Bundle extras) {
         this.requestedArrangement = new ArrangementChangeRequest(arrangement, extras);
         chatHeadContainer.requestLayout();
@@ -329,12 +307,11 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
         if (extras == null) extras = new Bundle();
 
         if (activeArrangement != null) {
-            extras.putAll(activeArrangement.getRetainBundle());
+            extras.putAll(activeArrangement.getBundleWithHero());
             activeArrangement.onDeactivate(maxWidth, maxHeight);
             oldArrangement = activeArrangement;
         }
         activeArrangement = requestedArrangement;
-        activeArrangementBundle = extras;
         requestedArrangement.onActivate(this, extras, maxWidth, maxHeight);
         if (hasChanged) {
             chatHeadContainer.onArrangementChanged(oldArrangement, newArrangement);
@@ -383,10 +360,6 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
         }
     }
 
-
-
-
-
     public void onCloseButtonAppear() {
         if (!getConfig().isCloseButtonHidden()) {
             closeButtonShadow.setVisibility(View.VISIBLE);
@@ -396,11 +369,6 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
     public void onCloseButtonDisappear() {
         closeButtonShadow.setVisibility(View.GONE);
     }
-
-
-
-
-
 
     @Override
     public View attachView(ChatHead<User> activeChatHead, ViewGroup parent) {
@@ -413,12 +381,10 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
         viewAdapter.removeView(chatHead.getUser(), chatHead, parent);
     }
 
-
     @Override
     public void detachView(ChatHead<User> chatHead, ViewGroup parent) {
         viewAdapter.detachView(chatHead.getUser(), chatHead, parent);
     }
-
 
     @Override
     public ChatHeadConfig getConfig() {
@@ -443,8 +409,6 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
 
     }
 
-
-
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
         if (closeButton != null) {
@@ -452,14 +416,14 @@ public class ChatHeadManager<User extends Serializable> implements ChatHeadManag
         }
     }
 
-
     private class ArrangementChangeRequest {
-        private final Bundle extras;
         private final Class<? extends ChatHeadArrangement> arrangement;
+        private final Bundle extras;
 
         public ArrangementChangeRequest(Class<? extends ChatHeadArrangement> arrangement, Bundle extras) {
             this.arrangement = arrangement;
             this.extras = extras;
+
         }
 
         public Bundle getExtras() {

@@ -15,6 +15,10 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
+/**
+ * Created by luvikaser on 01/03/2017.
+ */
+
 public class ChatHeadOverlayView extends View {
     private static final long ANIMATION_DURATION = 600;
     private float OVAL_RADIUS;

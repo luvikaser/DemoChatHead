@@ -9,7 +9,7 @@ import nhutlm2.fresher.demochathead.Utils.ChatHeadConfig;
 import nhutlm2.fresher.demochathead.ChatHeadManager.ChatHeadManager;
 
 /**
- * Created by cpu1-216-local on 07/03/2017.
+ * Created by luvikaser on 07/03/2017.
  */
 
 public abstract class ChatHeadArrangement {
@@ -25,21 +25,18 @@ public abstract class ChatHeadArrangement {
 
     public abstract void onChatHeadRemoved(ChatHead removed);
 
-    public abstract void onCapture(ChatHeadManager container, ChatHead activeChatHead);
-
     public abstract void selectChatHead(ChatHead chatHead);
 
     public abstract void bringToFront(ChatHead chatHead);
-
-    public abstract boolean shouldShowCloseButton(ChatHead chatHead);
 
     public abstract Integer getHeroIndex();
 
     public abstract void onConfigChanged(ChatHeadConfig newConfig);
 
-    public abstract Bundle getRetainBundle();
-
     public abstract boolean canDrag(ChatHead chatHead);
 
     public abstract void removeOldestChatHead();
+
+    public abstract Bundle getBundleWithHero();
+
 }

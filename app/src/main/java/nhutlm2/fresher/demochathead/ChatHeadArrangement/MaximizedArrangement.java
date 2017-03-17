@@ -21,7 +21,7 @@ import nhutlm2.fresher.demochathead.Utils.ChatHeadUtils;
 import nhutlm2.fresher.demochathead.Utils.SpringConfigsHolder;
 
 /**
- * Created by cpu1-216-local on 07/03/2017.
+ * Created by luvikaser on 07/03/2017.
  */
 
 public class MaximizedArrangement<User extends Serializable> extends ChatHeadArrangement {
@@ -36,8 +36,8 @@ public class MaximizedArrangement<User extends Serializable> extends ChatHeadArr
     private UpArrowLayout arrowLayout;
     private int maxDistanceFromOriginal;
     private int topPadding;
-    private boolean isActive = false;
     private Bundle extras;
+
 
     public MaximizedArrangement(ChatHeadManager<User> manager) {
         this.manager = manager;
@@ -47,14 +47,13 @@ public class MaximizedArrangement<User extends Serializable> extends ChatHeadArr
     @Override
     public void onActivate(ChatHeadManager container, Bundle extras, int maxWidth, int maxHeight) {
         this.manager = container;
+        this.extras = extras;
         this.maxWidth = maxWidth;
         this.maxHeight = maxHeight;
         MIN_VELOCITY_TO_POSITION_BACK = ChatHeadUtils.dpToPx(container.getDisplayMetrics(), 50);
         MAX_DISTANCE_FROM_ORIGINAL = ChatHeadUtils.dpToPx(container.getContext(), 10);
-        isActive = true;
         List<ChatHead> chatHeads = container.getChatHeads();
         int heroIndex = 0;
-        this.extras = extras;
         if (extras != null)
             heroIndex = extras.getInt(BUNDLE_HERO_INDEX_KEY, -1);
         if (heroIndex < 0 && currentChatHead != null) {
@@ -87,28 +86,8 @@ public class MaximizedArrangement<User extends Serializable> extends ChatHeadArr
 
 
             }
-            container.getCloseButton().setEnabled(true);
             container.showOverlayView(true);
             selectChatHead(currentChatHead);
-            currentChatHead.getVerticalSpring().addListener(new SimpleSpringListener() {
-                @Override
-                public void onSpringAtRest(Spring spring) {
-                    super.onSpringAtRest(spring);
-                    if (currentChatHead.getVerticalSpring() != null) {
-                        currentChatHead.getVerticalSpring().removeListener(this);
-                    }
-                }
-            });
-            currentChatHead.getHorizontalSpring().addListener(new SimpleSpringListener() {
-                @Override
-                public void onSpringAtRest(Spring spring) {
-                    super.onSpringAtRest(spring);
-
-                    if (currentChatHead.getHorizontalSpring() != null) {
-                        currentChatHead.getHorizontalSpring().removeListener(this);
-                    }
-                }
-            });
         }
     }
 
@@ -121,7 +100,6 @@ public class MaximizedArrangement<User extends Serializable> extends ChatHeadArr
         hideView();
         manager.hideOverlayView(true);
         positions.clear();
-        isActive = false;
     }
 
 
@@ -155,15 +133,11 @@ public class MaximizedArrangement<User extends Serializable> extends ChatHeadArr
 
     private void selectTab(final ChatHead<User> activeChatHead) {
         if (currentChatHead != activeChatHead) {
-            detach(currentChatHead);
+            manager.detachView(currentChatHead, getArrowLayout());
             currentChatHead = activeChatHead;
         }
         pointTo(activeChatHead);
         showOrHideView(activeChatHead);
-    }
-
-    private void detach(ChatHead chatHead) {
-        manager.detachView(chatHead, getArrowLayout());
     }
 
     private void positionToOriginal(ChatHead activeChatHead, Spring activeHorizontalSpring, Spring activeVerticalSpring) {
@@ -231,7 +205,14 @@ public class MaximizedArrangement<User extends Serializable> extends ChatHeadArr
 
             }
             if (activeChatHead.getState() == ChatHead.State.CAPTURED && activeVerticalSpring.isAtRest()) {
-                manager.captureChatHeads(activeChatHead);
+                manager.removeChatHead((User) activeChatHead.getUser());
+                manager.getCloseButton().onCapture();
+                manager.getCloseButton().disappear();
+            }
+
+            if (!activeVerticalSpring.isAtRest()) {
+                manager.getCloseButton().appear();
+            } else {
                 manager.getCloseButton().disappear();
             }
         }
@@ -244,7 +225,7 @@ public class MaximizedArrangement<User extends Serializable> extends ChatHeadArr
             double dy = activeChatHead.getVerticalSpring().getCurrentValue() - point.y;
             double distanceFromOriginal = Math.hypot(dx, dy);
             if (distanceFromOriginal < maxDistanceFromOriginal) {
-                showView(activeChatHead, dx, dy, distanceFromOriginal);
+                showView(dx, dy, distanceFromOriginal);
             } else {
                 hideView();
             }
@@ -259,21 +240,13 @@ public class MaximizedArrangement<User extends Serializable> extends ChatHeadArr
         return arrowLayout;
     }
 
-    private boolean isViewHidden() {
-        UpArrowLayout arrowLayout = getArrowLayout();
-        if (arrowLayout != null) {
-            return arrowLayout.getVisibility() == View.GONE;
-        }
-        return true;
-    }
-
     private void hideView() {
         UpArrowLayout arrowLayout = getArrowLayout();
         arrowLayout.setVisibility(View.GONE);
 
     }
 
-    private void showView(ChatHead activeChatHead, double dx, double dy, double distanceFromOriginal) {
+    private void showView(double dx, double dy, double distanceFromOriginal) {
         UpArrowLayout arrowLayout = getArrowLayout();
         arrowLayout.setVisibility(View.VISIBLE);
         arrowLayout.setTranslationX((float) dx);
@@ -326,7 +299,10 @@ public class MaximizedArrangement<User extends Serializable> extends ChatHeadArr
         positions.remove(removed);
         boolean isEmpty = false;
         if (currentChatHead == removed) {
-            ChatHead nextBestChatHead = manager.getChatHeads().get(0);
+            ChatHead nextBestChatHead = null;
+            if (manager.getChatHeads().size() != 0){
+                nextBestChatHead = manager.getChatHeads().get(0);
+            }
             if (nextBestChatHead != null) {
                 isEmpty = false;
                 selectTab(nextBestChatHead);
@@ -342,27 +318,9 @@ public class MaximizedArrangement<User extends Serializable> extends ChatHeadArr
 
     }
 
-
-    @Override
-    public void onCapture(ChatHeadManager container, ChatHead activeChatHead) {
-        container.removeChatHead(activeChatHead.getUser());
-
-    }
-
     @Override
     public void selectChatHead(final ChatHead chatHead) {
         selectTab(chatHead);
-    }
-
-
-
-    private Bundle getBundleWithHero() {
-        Bundle bundle = extras;
-        if (bundle == null) {
-            bundle = new Bundle();
-        }
-        bundle.putInt(MinimizedArrangement.BUNDLE_HERO_INDEX_KEY, getHeroIndex());
-        return bundle;
     }
 
     private void deactivate() {
@@ -370,6 +328,15 @@ public class MaximizedArrangement<User extends Serializable> extends ChatHeadArr
         hideView();
     }
 
+    @Override
+    public Bundle getBundleWithHero() {
+        Bundle bundle = extras;
+        if (bundle == null) {
+            bundle = new Bundle();
+        }
+        bundle.putInt(MinimizedArrangement.BUNDLE_HERO_INDEX_KEY, getHeroIndex());
+        return bundle;
+    }
     /**
      * @return the index of the selected chat head a.k.a the hero
      */
@@ -390,11 +357,6 @@ public class MaximizedArrangement<User extends Serializable> extends ChatHeadArr
     @Override
     public void onConfigChanged(ChatHeadConfig newConfig) {
 
-    }
-
-    @Override
-    public Bundle getRetainBundle() {
-        return getBundleWithHero();
     }
 
     @Override
@@ -420,10 +382,5 @@ public class MaximizedArrangement<User extends Serializable> extends ChatHeadArr
         selectChatHead(chatHead);
     }
 
-
-    @Override
-    public boolean shouldShowCloseButton(ChatHead chatHead) {
-        return true;
-    }
 
 }

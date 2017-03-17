@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import java.io.Serializable;
 
 /**
- * Created by cpu1-216-local on 13/03/2017.
+ * Created by luvikaser on 13/03/2017.
  */
 
 public class User implements Serializable {

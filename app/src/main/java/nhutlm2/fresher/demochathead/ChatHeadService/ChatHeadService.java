@@ -29,6 +29,10 @@ import nhutlm2.fresher.demochathead.ChatHeadManager.ChatHeadManager;
 import nhutlm2.fresher.demochathead.ChatHeadUI.PopupFragment.ChatHeadViewAdapter;
 import nhutlm2.fresher.demochathead.R;
 
+/**
+ * Created by luvikaser on 07/03/2017.
+ */
+
 public class ChatHeadService extends Service {
 
     // Binder given to clients
@@ -36,7 +40,6 @@ public class ChatHeadService extends Service {
     private ChatHeadManager<User> chatHeadManager;
     private ChatHeadContainer chatHeadContainer;
     private Map<User, View> viewCache = new HashMap<>();
-
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
@@ -83,9 +86,10 @@ public class ChatHeadService extends Service {
                 if(cachedView != null) {
                     viewCache.remove(user);
                     parent.removeView(cachedView);
-//                    if (viewCache.isEmpty()){
-//                        stopSelf();
-//                    }
+                }
+                if (chatHeadManager.getChatHeads().size() == 0){
+                    chatHeadContainer.destroy();
+                    stopSelf();
                 }
             }
 
@@ -133,7 +137,6 @@ public class ChatHeadService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        chatHeadContainer.destroy();
     }
 
     private Drawable getChatHeadDrawable(User user) {

@@ -1,7 +1,7 @@
 package nhutlm2.fresher.demochathead.ChatHeadUI.ChatHeadDrawable;
 
 /**
- * Created by cpu1-216-local on 01/03/2017.
+ * Created by luvikaser on 01/03/2017.
  */
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

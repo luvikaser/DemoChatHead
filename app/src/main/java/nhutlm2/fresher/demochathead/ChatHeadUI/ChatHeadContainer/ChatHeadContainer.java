@@ -25,8 +25,9 @@ import static android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
 import static android.view.WindowManager.LayoutParams.TYPE_PHONE;
 
 /**
- * Created by cpu1-216-local on 07/03/2017.
+ * Created by luvikaser on 07/03/2017.
  */
+
 
 public class ChatHeadContainer extends FrameChatHeadContainer {
 
@@ -224,12 +225,7 @@ public class ChatHeadContainer extends FrameChatHeadContainer {
         }
     }
 
-    private void removeContainer(View motionCaptureView) {
-        windowManager.removeView(motionCaptureView);
-    }
-
     public void destroy() {
-        windowManager.removeViewImmediate(motionCaptureView);
         windowManager.removeViewImmediate(getFrameLayout());
     }
 

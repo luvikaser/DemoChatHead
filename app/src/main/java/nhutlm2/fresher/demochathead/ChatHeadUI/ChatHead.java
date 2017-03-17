@@ -22,7 +22,7 @@ import nhutlm2.fresher.demochathead.Utils.ChatHeadUtils;
 import nhutlm2.fresher.demochathead.Utils.SpringConfigsHolder;
 
 /**
- * Created by cpu1-216-local on 07/03/2017.
+ * Created by luvikaser on 01/03/2017.
  */
 
 public class ChatHead<User extends Serializable> extends ImageView implements SpringListener {
@@ -192,7 +192,6 @@ public class ChatHead<User extends Serializable> extends ImageView implements Sp
         float rawY = event.getRawY();
         float offsetX = rawX - downX;
         float offsetY = rawY - downY;
-        boolean showCloseButton = manager.getActiveArrangement().shouldShowCloseButton(this);
         event.offsetLocation(manager.getChatHeadContainer().getViewX(this), manager.getChatHeadContainer().getViewY(this));
         if (action == MotionEvent.ACTION_DOWN) {
             if (velocityTracker == null) {
@@ -214,9 +213,7 @@ public class ChatHead<User extends Serializable> extends ImageView implements Sp
         } else if (action == MotionEvent.ACTION_MOVE) {
             if (Math.hypot(offsetX, offsetY) > touchSlop) {
                 isDragging = true;
-                if (showCloseButton) {
-                    manager.getCloseButton().appear();
-                }
+                manager.getCloseButton().appear();
             }
             velocityTracker.addMovement(event);
 
@@ -224,7 +221,7 @@ public class ChatHead<User extends Serializable> extends ImageView implements Sp
                 manager.getCloseButton().pointTo(rawX, rawY);
                 if (manager.getActiveArrangement().canDrag(this)) {
                     double distanceCloseButtonFromHead = manager.getDistanceCloseButtonFromHead(rawX, rawY);
-                    if (distanceCloseButtonFromHead < CLOSE_ATTRACTION_THRESHOLD && showCloseButton) {
+                    if (distanceCloseButtonFromHead < CLOSE_ATTRACTION_THRESHOLD) {
                         setState(State.CAPTURED);
                         activeHorizontalSpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
                         activeVerticalSpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
@@ -232,7 +229,6 @@ public class ChatHead<User extends Serializable> extends ImageView implements Sp
                         activeHorizontalSpring.setEndValue(coords[0]);
                         activeVerticalSpring.setEndValue(coords[1]);
                         manager.getCloseButton().onCapture();
-
                     } else {
                         setState(State.FREE);
                         activeHorizontalSpring.setSpringConfig(SpringConfigsHolder.DRAGGING);

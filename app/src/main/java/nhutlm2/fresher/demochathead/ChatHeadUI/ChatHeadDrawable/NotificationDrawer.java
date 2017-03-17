@@ -1,20 +1,14 @@
 package nhutlm2.fresher.demochathead.ChatHeadUI.ChatHeadDrawable;
 
-/**
- * Created by cpu1-216-local on 01/03/2017.
- */
-
-
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
 /**
- * Draws notification
- * Created by vivek.soneja on 23/04/15.
+ * Created by luvikaser on 01/03/2017.
  */
-@SuppressWarnings("unused")
+
 public class NotificationDrawer {
     private float mNotificationCenterX;
     private float mNotificationCenterY;

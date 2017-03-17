@@ -1,7 +1,7 @@
 package nhutlm2.fresher.demochathead.ChatHeadManager;
 
 /**
- * Created by cpu1-216-local on 07/03/2017.
+ * Created by luvikaser on 07/03/2017.
  */
 
 import android.content.Context;
@@ -31,8 +31,6 @@ public interface ChatHeadManagerListener<User extends Serializable> {
 
         ChatHeadArrangement getActiveArrangement();
 
-        void selectChatHead(ChatHead chatHead);
-
         void onMeasure(int height, int width);
 
         ChatHead<User> addChatHead(User user);
@@ -46,10 +44,6 @@ public interface ChatHeadManagerListener<User extends Serializable> {
         boolean removeChatHead(User user);
 
         ChatHeadOverlayView getOverlayView();
-
-        void captureChatHeads(ChatHead causingChatHead);
-
-        ChatHeadArrangement getArrangement(Class<? extends ChatHeadArrangement> arrangementType);
 
         void setArrangement(Class<? extends ChatHeadArrangement> arrangement, Bundle extras);
 

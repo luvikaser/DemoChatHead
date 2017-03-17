@@ -14,6 +14,10 @@ import android.os.Bundle;
 
 import nhutlm2.fresher.demochathead.ChatHeadService.ChatHeadService;
 
+/**
+ * Created by luvikaser on 01/03/2017.
+ */
+
 public class MainActivity extends AppCompatActivity {
     public static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE= 5469;
     private ChatHeadService chatHeadService;

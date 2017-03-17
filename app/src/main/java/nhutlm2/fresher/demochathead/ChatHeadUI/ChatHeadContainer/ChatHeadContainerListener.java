@@ -8,7 +8,7 @@ import nhutlm2.fresher.demochathead.ChatHeadArrangement.ChatHeadArrangement;
 import nhutlm2.fresher.demochathead.ChatHeadManager.ChatHeadManager;
 
 /**
- * Created by cpu1-216-local on 07/03/2017.
+ * Created by luvikaser on 07/03/2017.
  */
 
 public interface ChatHeadContainerListener {

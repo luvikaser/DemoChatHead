@@ -4,8 +4,9 @@ import android.content.Context;
 import android.graphics.Point;
 
 /**
- * Created by kiran.kumar on 06/05/15.
+ * Created by luvikaser on 01/03/2017.
  */
+
 public class ChatHeadDefaultConfig extends ChatHeadConfig {
     public ChatHeadDefaultConfig(Context context) {
         int diameter = 65;

@@ -3,7 +3,7 @@ package nhutlm2.fresher.demochathead.Utils;
 import android.graphics.Point;
 
 /**
- * Created by cpu1-216-local on 07/03/2017.
+ * Created by luvikaser on 01/03/2017.
  */
 
 public class ChatHeadConfig {

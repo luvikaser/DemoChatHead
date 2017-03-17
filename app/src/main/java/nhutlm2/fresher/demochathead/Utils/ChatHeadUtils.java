@@ -5,6 +5,10 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.WindowManager;
 
+/**
+ * Created by luvikaser on 01/03/2017.
+ */
+
 public class ChatHeadUtils {
 
 

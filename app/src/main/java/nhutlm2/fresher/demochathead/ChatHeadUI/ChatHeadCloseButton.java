@@ -14,6 +14,10 @@ import nhutlm2.fresher.demochathead.ChatHeadManager.ChatHeadManager;
 import nhutlm2.fresher.demochathead.R;
 import nhutlm2.fresher.demochathead.Utils.SpringConfigsHolder;
 
+/**
+ * Created by luvikaser on 01/03/2017.
+ */
+
 public class ChatHeadCloseButton extends ImageView {
 
     private static final float PERC_PARENT_WIDTH = 0.1f; //perc of parent to be covered during drag
@@ -69,6 +73,7 @@ public class ChatHeadCloseButton extends ImageView {
                 setScaleY((float) currentValue);
             }
         });
+        setEnabled(true);
     }
 
 

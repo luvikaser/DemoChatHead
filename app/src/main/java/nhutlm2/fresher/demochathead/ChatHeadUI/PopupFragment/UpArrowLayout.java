@@ -14,12 +14,13 @@ import java.util.ArrayList;
 import nhutlm2.fresher.demochathead.R;
 
 /**
- * Created by cpu1-216-local on 07/03/2017.
+ * Created by luvikaser on 07/03/2017.
  */
 
 public class UpArrowLayout extends ViewGroup {
     private final Point pointTo = new Point(0, 0);
     private ImageView arrowView;
+    private final ArrayList<View> mMatchParentChildren = new ArrayList<View>(1);
     private int arrowDrawable = R.drawable.chat_top_arrow;
 
     public UpArrowLayout(Context context) {
@@ -56,9 +57,95 @@ public class UpArrowLayout extends ViewGroup {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        int count = getChildCount();
         int measureSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
         arrowView.measure(measureSpec, measureSpec);
+        int arrowViewMeasuredHeight = arrowView.getMeasuredHeight();
+        int size = MeasureSpec.getSize(heightMeasureSpec);
+        if (size > arrowViewMeasuredHeight) {
+            size -= arrowViewMeasuredHeight + pointTo.y;
+            heightMeasureSpec = MeasureSpec.makeMeasureSpec(size, MeasureSpec.getMode(heightMeasureSpec));
+        }
+
+
+        final boolean measureMatchParentChildren =
+                MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.EXACTLY ||
+                        MeasureSpec.getMode(heightMeasureSpec) != MeasureSpec.EXACTLY;
+
+        int maxHeight = 0;
+        int maxWidth = 0;
+        int childState = 0;
+
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            if (child == arrowView) continue;
+            if (child.getVisibility() != GONE) {
+                measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
+                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                maxWidth = Math.max(maxWidth,
+                        child.getMeasuredWidth());
+                maxHeight = Math.max(maxHeight,
+                        child.getMeasuredHeight());
+                childState = combineMeasuredStates(childState, child.getMeasuredState());
+                if (measureMatchParentChildren) {
+                    if (lp.width == LayoutParams.MATCH_PARENT ||
+                            lp.height == LayoutParams.MATCH_PARENT) {
+                        mMatchParentChildren.add(child);
+                    }
+                }
+            }
+        }
+
+
+        // Check against our minimum height and width
+        maxHeight = Math.max(maxHeight, getSuggestedMinimumHeight());
+        maxWidth = Math.max(maxWidth, getSuggestedMinimumWidth());
+
+
+        setMeasuredDimension(resolveSizeAndState(maxWidth, widthMeasureSpec, childState),
+                resolveSizeAndState(maxHeight, heightMeasureSpec,
+                        childState << MEASURED_HEIGHT_STATE_SHIFT));
+
+        count = mMatchParentChildren.size();
+        if (count > 1) {
+            for (int i = 0; i < count; i++) {
+                final View child = mMatchParentChildren.get(i);
+
+                final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+                int childWidthMeasureSpec;
+                int childHeightMeasureSpec;
+
+                if (lp.width == LayoutParams.MATCH_PARENT) {
+                    childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(getMeasuredWidth() -
+                                    lp.leftMargin - lp.rightMargin,
+                            MeasureSpec.EXACTLY);
+                } else {
+                    childWidthMeasureSpec = getChildMeasureSpec(widthMeasureSpec,
+
+                            lp.leftMargin + lp.rightMargin,
+                            lp.width);
+                }
+
+                if (lp.height == LayoutParams.MATCH_PARENT) {
+                    childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(getMeasuredHeight() -
+
+                                    lp.topMargin - lp.bottomMargin,
+                            MeasureSpec.EXACTLY);
+                } else {
+                    childHeightMeasureSpec = getChildMeasureSpec(heightMeasureSpec,
+
+                            lp.topMargin + lp.bottomMargin,
+                            lp.height);
+                }
+
+                child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+            }
+        }
+
+
+        setMeasuredDimension(getMeasuredWidth(), getMeasuredHeight() + arrowViewMeasuredHeight + pointTo.y);
         updatePointer();
+
     }
 
 
