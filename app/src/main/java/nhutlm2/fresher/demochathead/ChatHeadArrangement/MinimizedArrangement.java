@@ -345,8 +345,6 @@ public class MinimizedArrangement<User extends Serializable> extends ChatHeadArr
     @Override
     public void onSpringUpdate(ChatHead activeChatHead, boolean isDragging, int maxWidth, int maxHeight, Spring spring, Spring activeHorizontalSpring, Spring activeVerticalSpring, int totalVelocity) {
         /** This method does a bounds Check **/
-        double xVelocity = activeHorizontalSpring.getVelocity();
-        double yVelocity = activeVerticalSpring.getVelocity();
         if (!isDragging && Math.abs(totalVelocity) < MIN_VELOCITY_TO_POSITION_BACK && activeChatHead == hero) {
 
             if (Math.abs(totalVelocity) < MAX_VELOCITY_FOR_IDLING && activeChatHead.getState() == ChatHead.State.FREE && hasActivated) {

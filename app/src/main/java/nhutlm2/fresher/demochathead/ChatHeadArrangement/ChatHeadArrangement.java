@@ -17,6 +17,7 @@ public abstract class ChatHeadArrangement {
 
     public abstract void onDeactivate(int maxWidth, int maxHeight);
 
+    //
     public abstract void onSpringUpdate(ChatHead activeChatHead, boolean isDragging, int maxWidth, int maxHeight, Spring spring, Spring activeHorizontalSpring, Spring activeVerticalSpring, int totalVelocity);
 
     public abstract boolean handleTouchUp(ChatHead activeChatHead, int xVelocity, int yVelocity, Spring activeHorizontalSpring, Spring activeVerticalSpring, boolean wasDragging);
