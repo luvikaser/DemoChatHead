@@ -36,6 +36,15 @@ public class ChatHeadContainer extends FrameChatHeadContainer {
     private WindowManager windowManager;
     private ChatHeadArrangement currentArrangement;
     private boolean motionCaptureViewAdded;
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            HostFrameLayout frameLayout = getFrameLayout();
+            if (frameLayout != null) {
+                frameLayout.minimize();
+            }
+        }
+    };
 
     public ChatHeadContainer(Context context) {
         super(context);
@@ -48,20 +57,9 @@ public class ChatHeadContainer extends FrameChatHeadContainer {
 
         MotionCapturingTouchListener listener = new MotionCapturingTouchListener();
         motionCaptureView.setOnTouchListener(listener);
-        registerReceiver(getContext());
+        getContext().registerReceiver(mBroadcastReceiver, new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
     }
 
-    public void registerReceiver(Context context) {
-        context.registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                HostFrameLayout frameLayout = getFrameLayout();
-                if (frameLayout != null) {
-                    frameLayout.minimize();
-                }
-            }
-        }, new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
-    }
 
     public WindowManager getWindowManager() {
         if (windowManager == null) {
@@ -226,6 +224,7 @@ public class ChatHeadContainer extends FrameChatHeadContainer {
     }
 
     public void destroy() {
+        getContext().unregisterReceiver(mBroadcastReceiver);
         windowManager.removeViewImmediate(getFrameLayout());
     }
 

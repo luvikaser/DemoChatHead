@@ -37,7 +37,7 @@ public class ChatHeadService extends Service {
 
     // Binder given to clients
     private final IBinder mBinder = new LocalBinder();
-    private ChatHeadManager<User> chatHeadManager;
+    private ChatHeadManager<User> chatHeadManager = null;
     private ChatHeadContainer chatHeadContainer;
     private Map<User, View> viewCache = new HashMap<>();
     @Override
@@ -47,61 +47,62 @@ public class ChatHeadService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        chatHeadContainer = new ChatHeadContainer(this);
-        chatHeadManager = new ChatHeadManager<User>(this, chatHeadContainer);
-        chatHeadManager.setViewAdapter(new ChatHeadViewAdapter<User>() {
+        if (chatHeadManager == null) {
+            chatHeadContainer = new ChatHeadContainer(this);
+            chatHeadManager = new ChatHeadManager<User>(this, chatHeadContainer);
+            chatHeadManager.setViewAdapter(new ChatHeadViewAdapter<User>() {
 
-            @Override
-            public View attachView(User user, ChatHead chatHead, ViewGroup parent) {
-                View cachedView = viewCache.get(user);
-                if (cachedView == null) {
-                    LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-                    View view = inflater.inflate(R.layout.fragment_test, parent, false);
-                    TextView identifier = (TextView) view.findViewById(R.id.identifier);
-                    identifier.setText(String.valueOf(user.id));
-                    cachedView = view;
-                    viewCache.put(user, view);
-                }
-                cachedView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
+                @Override
+                public View attachView(User user, ChatHead chatHead, ViewGroup parent) {
+                    View cachedView = viewCache.get(user);
+                    if (cachedView == null) {
+                        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+                        View view = inflater.inflate(R.layout.fragment_test, parent, false);
+                        TextView identifier = (TextView) view.findViewById(R.id.identifier);
+                        identifier.setText(String.valueOf(user.id));
+                        cachedView = view;
+                        viewCache.put(user, view);
                     }
-                });
-                parent.addView(cachedView);
-                return cachedView;
-            }
+                    cachedView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
 
-            @Override
-            public void detachView(User user, ChatHead<? extends Serializable> chatHead, ViewGroup parent) {
-                View cachedView = viewCache.get(user);
-                if(cachedView != null) {
-                    parent.removeView(cachedView);
+                        }
+                    });
+                    parent.addView(cachedView);
+                    return cachedView;
                 }
-            }
 
-            @Override
-            public void removeView(User user, ChatHead<? extends Serializable> chatHead, ViewGroup parent) {
-                View cachedView = viewCache.get(user);
-                if(cachedView != null) {
-                    viewCache.remove(user);
-                    parent.removeView(cachedView);
+                @Override
+                public void detachView(User user, ChatHead<? extends Serializable> chatHead, ViewGroup parent) {
+                    View cachedView = viewCache.get(user);
+                    if (cachedView != null) {
+                        parent.removeView(cachedView);
+                    }
                 }
-                if (chatHeadManager.getChatHeads().size() == 0){
-                    chatHeadContainer.destroy();
-                    stopSelf();
+
+                @Override
+                public void removeView(User user, ChatHead<? extends Serializable> chatHead, ViewGroup parent) {
+                    View cachedView = viewCache.get(user);
+                    if (cachedView != null) {
+                        viewCache.remove(user);
+                        parent.removeView(cachedView);
+                    }
+                    if (chatHeadManager.getChatHeads().size() == 0) {
+                        chatHeadContainer.destroy();
+                        stopSelf();
+                    }
                 }
-            }
 
-            @Override
-            public Drawable getChatHeadDrawable(User user) {
-                return ChatHeadService.this.getChatHeadDrawable(user);
-            }
-        });
+                @Override
+                public Drawable getChatHeadDrawable(User user) {
+                    return ChatHeadService.this.getChatHeadDrawable(user);
+                }
+            });
 
-        chatHeadManager.setArrangement(MinimizedArrangement.class, null);
-        testData();
-
+            chatHeadManager.setArrangement(MinimizedArrangement.class, null);
+            testData();
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 

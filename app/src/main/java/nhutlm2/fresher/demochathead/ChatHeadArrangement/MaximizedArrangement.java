@@ -52,6 +52,7 @@ public class MaximizedArrangement<User extends Serializable> extends ChatHeadArr
         this.maxHeight = maxHeight;
         MIN_VELOCITY_TO_POSITION_BACK = ChatHeadUtils.dpToPx(container.getDisplayMetrics(), 50);
         MAX_DISTANCE_FROM_ORIGINAL = ChatHeadUtils.dpToPx(container.getContext(), 10);
+
         List<ChatHead> chatHeads = container.getChatHeads();
         int heroIndex = 0;
         if (extras != null)
@@ -280,7 +281,6 @@ public class MaximizedArrangement<User extends Serializable> extends ChatHeadArr
         }
     }
 
-
     @Override
     public void onChatHeadAdded(final ChatHead chatHead) {
         //we post so that chat head measurement is done
@@ -298,6 +298,7 @@ public class MaximizedArrangement<User extends Serializable> extends ChatHeadArr
         manager.removeView(removed, getArrowLayout());
         positions.remove(removed);
         boolean isEmpty = false;
+
         if (currentChatHead == removed) {
             ChatHead nextBestChatHead = null;
             if (manager.getChatHeads().size() != 0){
